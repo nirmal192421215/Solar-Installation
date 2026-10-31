@@ -1,0 +1,15 @@
+# Secrets and local environment
+.env
+.env.*
+*.key
+
+# OS / editor clutter
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Dependencies and logs
+node_modules/
+*.log

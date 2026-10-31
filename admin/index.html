@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Sun Power CRM</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23F2620F'/%3E%3Cpath d='M14 40a18 18 0 0 1 36 0z' fill='%23fff'/%3E%3Cpath d='M10 46h44' stroke='%23fff' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css?v=7">
+</head>
+<body>
+
+  <!-- Login -->
+  <section class="login" id="loginView" hidden>
+    <form class="login__card" id="loginForm">
+      <div class="brand">
+        <span class="brand__mark" aria-hidden="true"></span>
+        <span>Sun Power <b>CRM</b></span>
+      </div>
+      <h1>Sign in</h1>
+      <p class="muted">For the Sun Power team only.</p>
+      <label>
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="username">
+      </label>
+      <label>
+        <span>Password</span>
+        <input type="password" name="password" required autocomplete="current-password">
+      </label>
+      <button type="submit" class="btn btn--primary btn--block">Sign in</button>
+      <p class="login__error" id="loginError" role="alert"></p>
+    </form>
+  </section>
+
+  <!-- App -->
+  <div class="app" id="appView" hidden>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand__mark" aria-hidden="true"></span>
+        <span>Sun Power <b>CRM</b></span>
+      </div>
+      <div class="topbar__right">
+        <button class="btn btn--ghost btn--sm" id="settingsBtn">Quote settings</button>
+        <span class="topbar__user" id="userEmail"></span>
+        <button class="btn btn--ghost btn--sm" id="logoutBtn">Sign out</button>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- Stats -->
+      <section class="stats">
+        <div class="stat"><span>Total leads</span><strong id="sTotal">0</strong></div>
+        <div class="stat stat--accent"><span>New (not contacted)</span><strong id="sNew">0</strong></div>
+        <div class="stat"><span>Last 7 days</span><strong id="sWeek">0</strong></div>
+        <div class="stat"><span>Meetings today</span><strong id="sMeetToday">0</strong></div>
+        <div class="stat"><span>Won</span><strong id="sWon">0</strong></div>
+        <div class="stat"><span>Conversion</span><strong id="sConv">0%</strong></div>
+      </section>
+
+      <!-- Upcoming meetings -->
+      <section class="upcoming" id="upcoming" hidden>
+        <div class="upcoming__head">
+          <h2>Upcoming meetings</h2>
+          <span class="muted" id="upcomingCount"></span>
+        </div>
+        <ol class="upcoming__list" id="upcomingList"></ol>
+      </section>
+
+      <!-- Pipeline filter -->
+      <nav class="pipeline" id="pipeline" aria-label="Filter by status"></nav>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <input type="search" id="search" placeholder="Search name, phone, area or email" aria-label="Search leads">
+        <select id="dateFilter" aria-label="Filter by date">
+          <option value="all">All time</option>
+          <option value="1">Today</option>
+          <option value="7">Last 7 days</option>
+          <option value="30">Last 30 days</option>
+        </select>
+        <div class="toolbar__spacer"></div>
+        <button class="btn btn--ghost" id="refreshBtn">Refresh</button>
+        <button class="btn btn--ghost" id="exportBtn">Export CSV</button>
+        <button class="btn btn--primary" id="addBtn">+ Add lead</button>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Received</th>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Location</th>
+              <th>Bill</th>
+              <th>Size / type</th>
+              <th>Call time</th>
+              <th>Status</th>
+              <th>AI call</th>
+              <th>Follow-up</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <p class="empty" id="emptyState" hidden>No leads match these filters.</p>
+      </div>
+    </main>
+  </div>
+
+  <!-- Lead drawer -->
+  <div class="drawer" id="drawer" hidden>
+    <div class="drawer__backdrop" data-close></div>
+    <aside class="drawer__panel" role="dialog" aria-modal="true" aria-labelledby="dName">
+      <header class="drawer__head">
+        <div>
+          <h2 id="dName"></h2>
+          <p class="muted" id="dMeta"></p>
+        </div>
+        <button class="icon-btn" data-close aria-label="Close">✕</button>
+      </header>
+
+      <div class="drawer__body">
+        <div class="quick">
+          <a class="btn btn--primary btn--sm" id="dCall">Call</a>
+          <a class="btn btn--ghost btn--sm" id="dWhatsApp" target="_blank" rel="noopener">WhatsApp</a>
+          <a class="btn btn--ghost btn--sm" id="dEmail">Email</a>
+        </div>
+
+        <h3>Details</h3>
+        <dl class="details" id="dDetails"></dl>
+
+        <h3>Requirements</h3>
+        <form class="manage" id="reqForm">
+          <label><span>Owns property</span>
+            <select name="owns_property"><option value="">—</option><option>Yes</option><option>No</option><option>Unknown</option></select>
+          </label>
+          <label><span>Roof type</span><input name="roof_type" placeholder="RCC, sheet, tiled…"></label>
+          <label><span>Roof area</span><input name="roof_area" placeholder="e.g. 400 sq ft"></label>
+          <label><span>Shading</span><input name="shading" placeholder="e.g. none, tree on east side"></label>
+          <label><span>Install timeline</span><input name="install_timeline" placeholder="e.g. within a month"></label>
+          <label class="span-2"><span>Notes</span><textarea name="requirement_notes" rows="2" placeholder="Anything else the team should know"></textarea></label>
+          <button type="submit" class="btn btn--primary">Save requirements</button>
+          <span class="saved" id="reqSaved" role="status"></span>
+        </form>
+
+        <div class="section-head">
+          <h3>Quotation</h3>
+          <button type="button" class="btn btn--primary btn--sm" id="prepareQuoteBtn">Prepare quote</button>
+        </div>
+        <div id="quoteBox"></div>
+        <ol class="quotes" id="quotesList"></ol>
+
+        <div class="section-head">
+          <h3>Meetings</h3>
+          <button type="button" class="btn btn--ghost btn--sm" id="addMeetingBtn">+ Schedule</button>
+        </div>
+        <form class="manage meeting-form" id="meetingForm" hidden>
+          <label><span>Type</span>
+            <select name="type"><option value="site_survey">Site survey</option><option value="callback">Callback</option><option value="meeting">Meeting</option></select>
+          </label>
+          <label><span>Date</span><input type="date" name="scheduled_date" required></label>
+          <label><span>Time / slot</span><input name="time_slot" placeholder="e.g. Morning 10–1"></label>
+          <label class="span-2"><span>Agenda</span><textarea name="agenda" rows="2" placeholder="What is this meeting for?"></textarea></label>
+          <button type="submit" class="btn btn--primary">Save meeting</button>
+        </form>
+        <ol class="meetings" id="meetings"></ol>
+
+        <h3>Manage</h3>
+        <form class="manage" id="manageForm">
+          <label>
+            <span>Status</span>
+            <select name="status" id="dStatus"></select>
+          </label>
+          <label>
+            <span>Follow-up date</span>
+            <input type="date" name="follow_up_date">
+          </label>
+          <label>
+            <span>Assigned to</span>
+            <select name="assigned_to" id="dAssigned"></select>
+          </label>
+          <label>
+            <span>Deal value (₹)</span>
+            <input type="number" name="deal_value" min="0" step="1" placeholder="e.g. 180000">
+          </label>
+          <button type="submit" class="btn btn--primary">Save changes</button>
+          <span class="saved" id="savedMsg" role="status"></span>
+        </form>
+
+        <div class="section-head">
+          <h3>AI calls</h3>
+          <button type="button" class="btn btn--dark btn--sm" id="aiCallBtn">Call with AI now</button>
+        </div>
+        <ol class="calls" id="calls"></ol>
+
+        <h3>Activity</h3>
+        <form class="note-form" id="noteForm">
+          <select name="type" aria-label="Activity type">
+            <option value="note">Note</option>
+            <option value="call">Call log</option>
+          </select>
+          <textarea name="body" rows="2" placeholder="Add a note or call summary…" required></textarea>
+          <button type="submit" class="btn btn--dark btn--sm">Add</button>
+        </form>
+        <ol class="timeline" id="timeline"></ol>
+
+        <button class="danger-link" id="deleteBtn">Delete this lead</button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Add lead modal -->
+  <div class="modal" id="addModal" hidden>
+    <div class="drawer__backdrop" data-close-add></div>
+    <form class="modal__card" id="addForm">
+      <header class="drawer__head">
+        <h2>Add a lead</h2>
+        <button type="button" class="icon-btn" data-close-add aria-label="Close">✕</button>
+      </header>
+      <div class="modal__grid">
+        <label><span>Full name *</span><input name="name" required minlength="2"></label>
+        <label><span>Phone (10 digits) *</span><input name="phone" required inputmode="numeric" pattern="[6-9][0-9]{9}"></label>
+        <label><span>City / pincode *</span><input name="location" required minlength="2"></label>
+        <label><span>Email</span><input name="email" type="email"></label>
+        <label><span>Property type</span>
+          <select name="property_type"><option value="">—</option><option>Home</option><option>Shop</option><option>Factory</option></select>
+        </label>
+        <label><span>Monthly bill</span>
+          <select name="monthly_bill"><option value="">—</option><option>Below ₹2,000</option><option>₹2,000 – ₹4,000</option><option>₹4,000 – ₹6,000</option><option>Above ₹6,000</option></select>
+        </label>
+        <label><span>Source</span>
+          <select name="source"><option value="phone">Phone call</option><option value="walk-in">Walk-in</option><option value="referral">Referral</option><option value="other">Other</option></select>
+        </label>
+      </div>
+      <label class="check"><input type="checkbox" name="consent" required> Customer agreed to be contacted *</label>
+      <button type="submit" class="btn btn--primary btn--block">Add lead</button>
+      <p class="login__error" id="addError" role="alert"></p>
+    </form>
+  </div>
+
+  <!-- Quote settings modal -->
+  <div class="modal" id="settingsModal" hidden>
+    <div class="drawer__backdrop" data-close-settings></div>
+    <form class="modal__card modal__card--wide" id="settingsForm">
+      <header class="drawer__head">
+        <div>
+          <h2>Quote settings</h2>
+          <p class="muted">Used for every quotation. Prices are per kW of system size.</p>
+        </div>
+        <button type="button" class="icon-btn" data-close-settings aria-label="Close">✕</button>
+      </header>
+
+      <p class="quote-warn" id="settingsHint" hidden>Suggested starting values are filled in and <b>highlighted</b>. Check them against your real costs, change anything that differs, then click <b>Save settings</b>.</p>
+
+      <h3 class="form-section">Prices (₹ per kW)</h3>
+      <div class="modal__grid modal__grid--3">
+        <label><span>On-grid</span><input type="number" min="0" step="1" name="price_on_grid" placeholder="e.g. 60000"></label>
+        <label><span>Hybrid (with battery)</span><input type="number" min="0" step="1" name="price_hybrid"></label>
+        <label><span>Off-grid (battery)</span><input type="number" min="0" step="1" name="price_off_grid"></label>
+      </div>
+      <div class="modal__grid modal__grid--3">
+        <label><span>GST %</span><input type="number" min="0" max="28" step="any" name="gst_percent" placeholder="your GST rate"></label>
+        <label><span>Prices above</span>
+          <select name="prices_include_gst"><option value="false">exclude GST</option><option value="true">include GST</option></select>
+        </label>
+        <label><span>Quote valid for (days)</span><input type="number" min="1" name="validity_days" placeholder="15"></label>
+      </div>
+      <div class="modal__grid modal__grid--3">
+        <label><span>Net-metering charges (₹)</span><input type="number" min="0" step="1" name="net_metering_charges" placeholder="0 if included"></label>
+        <label><span>Other charges label</span><input name="other_charges_label" placeholder="e.g. Elevated structure"></label>
+        <label><span>Other charges (₹)</span><input type="number" min="0" step="1" name="other_charges"></label>
+      </div>
+      <label class="check"><input type="checkbox" name="apply_subsidy"> Show PM Surya Ghar subsidy on home quotes (on-grid &amp; hybrid)</label>
+
+      <h3 class="form-section">Components</h3>
+      <div class="modal__grid">
+        <label><span>Solar panels</span><input name="panel" placeholder="e.g. 540 Wp Mono PERC, Tier-1 (brand)"></label>
+        <label><span>Inverter</span><input name="inverter" placeholder="e.g. On-grid string inverter (brand)"></label>
+        <label><span>Battery (hybrid / off-grid)</span><input name="battery" placeholder="e.g. Lithium 5 kWh (brand)"></label>
+        <label><span>Mounting structure</span><input name="structure" placeholder="e.g. Hot-dip galvanised, wind-rated"></label>
+        <label class="span-2"><span>Cables, protection &amp; earthing</span><input name="bos" placeholder="e.g. DC/AC cables, ACDB/DCDB, lightning arrestor, earthing"></label>
+      </div>
+
+      <h3 class="form-section">Warranty &amp; terms</h3>
+      <div class="modal__grid modal__grid--3">
+        <label><span>Panel warranty</span><input name="warranty_panel" placeholder="e.g. 25 years performance"></label>
+        <label><span>Inverter warranty</span><input name="warranty_inverter" placeholder="e.g. 5 years"></label>
+        <label><span>Installation warranty</span><input name="warranty_installation" placeholder="e.g. 5 years"></label>
+      </div>
+      <label><span>Payment terms</span><textarea name="payment_terms" rows="2" placeholder="e.g. 50% advance, 40% on delivery of material, 10% after installation"></textarea></label>
+      <label><span>Other terms / notes on the quote</span><textarea name="notes" rows="2" placeholder="e.g. Installation within 15 days of advance. Prices subject to site survey."></textarea></label>
+
+      <h3 class="form-section">Business details on the PDF</h3>
+      <div class="modal__grid">
+        <label><span>GSTIN</span><input name="gstin"></label>
+        <label><span>Email</span><input type="email" name="email"></label>
+        <label><span>Phone</span><input name="phone" placeholder="+91 93426 26096"></label>
+        <label class="span-2"><span>Address</span><input name="address" placeholder="No 2B, Sri Laxmi Nagar Colony Rd, West Hanuman Nagar, Boduppal, Hyderabad, Telangana 500092"></label>
+      </div>
+
+      <button type="submit" class="btn btn--primary btn--block">Save settings</button>
+      <p class="login__error" id="settingsError" role="alert"></p>
+    </form>
+  </div>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="vendor/jspdf.umd.min.js"></script>
+  <script src="vendor/jspdf.plugin.autotable.min.js"></script>
+  <script src="admin.js?v=7"></script>
+  <script src="quotes.js?v=4"></script>
+</body>
+</html>
