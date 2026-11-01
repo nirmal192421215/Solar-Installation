@@ -10,7 +10,20 @@ dispatch, installation and after-sales service in one CRM. The customer gets the
 
 ---
 
+## Team & modules
+
+The system is built as three modules. Each module's commit history is merged into this repository.
+
+| Module | What it covers | Repository | Details |
+|---|---|---|---|
+| **1. Sales & AI Engagement** | Website, AI calling (Bolna), Gemini call minutes, WhatsApp, leads, site surveys, quotations, CRM shell | [mailformedineshc-ctrl/odoo-solar-pannel](https://github.com/mailformedineshc-ctrl/odoo-solar-pannel) | [Module 1 guide](docs/modules/module-1-sales-ai-engagement.md) |
+| **2. Operations & Field Service** | Orders and payments, stock and purchases, warehouse and dispatch, crew schedule, installation, service tickets | This repository | See [Features](#features) |
+| **3. Reports & Customer** | GST invoices, job profit, subsidy, technician pay, director dashboard, customer login with warranty cards | [gayathridevi2007/odoo-solar-installation-management-](https://github.com/gayathridevi2007/odoo-solar-installation-management-) | [Module 3 guide](docs/modules/module-3-reports-customer.md) |
+
+---
+
 ## Contents
+- [Team & modules](#team--modules)
 - [What it does](#what-it-does)
 - [Who uses it](#who-uses-it)
 - [How it fits together](#how-it-fits-together)
