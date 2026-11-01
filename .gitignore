@@ -1,0 +1,11 @@
+# OS / editor clutter
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Secrets and local environment
+.env
+.env.*
+
+# Supabase CLI local state
+supabase/.temp/
