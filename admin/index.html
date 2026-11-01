@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="admin.css?v=7">
+  <link rel="stylesheet" href="admin.css?v=25">
 </head>
 <body>
 
@@ -42,72 +42,375 @@
         <span class="brand__mark" aria-hidden="true"></span>
         <span>Sun Power <b>CRM</b></span>
       </div>
+      <nav class="topnav" aria-label="Main">
+        <button type="button" class="topnav__item is-active" data-view="leads" aria-current="page">Leads</button>
+        <button type="button" class="topnav__item" id="surveysBtn">Surveys <em class="count" id="surveysCount" hidden></em></button>
+        <button type="button" class="topnav__item" data-view="orders">Orders</button>
+        <button type="button" class="topnav__item" data-view="warehouse">Warehouse <em class="count" hidden></em></button>
+        <button type="button" class="topnav__item" data-view="schedule">Schedule</button>
+        <button type="button" class="topnav__item" data-view="service">Service <em class="count" hidden></em></button>
+        <button type="button" class="topnav__item" data-view="subsidy">Subsidy</button>
+        <button type="button" class="topnav__item" data-view="director" hidden>Director</button>
+        <button type="button" class="topnav__item" data-view="team" hidden>Team</button>
+        <button type="button" class="topnav__item" data-view="products">Products <em class="count" hidden></em></button>
+        <button type="button" class="topnav__item" data-view="kits">Kit templates</button>
+        <button type="button" class="topnav__item" id="settingsBtn">Quote settings</button>
+      </nav>
       <div class="topbar__right">
-        <button class="btn btn--ghost btn--sm" id="settingsBtn">Quote settings</button>
         <span class="topbar__user" id="userEmail"></span>
-        <button class="btn btn--ghost btn--sm" id="logoutBtn">Sign out</button>
+        <button type="button" class="link-btn" id="logoutBtn">Sign out</button>
       </div>
     </header>
 
     <main class="main">
+      <!-- Leads -->
+      <section class="view" data-view="leads">
+      <div class="page-head">
+        <div>
+          <h1>Leads</h1>
+          <p class="muted">Every enquiry from the website, phone and walk-ins.</p>
+        </div>
+        <div class="page-actions">
+          <button type="button" class="btn btn--ghost btn--sm" id="refreshBtn" title="Refresh">↻ Refresh</button>
+          <button type="button" class="btn btn--ghost btn--sm" id="exportBtn">Export</button>
+          <button type="button" class="btn btn--primary btn--sm" id="addBtn">+ Add lead</button>
+        </div>
+      </div>
+
+      <!-- Orders at a glance -->
+      <section class="tiles" id="tiles" aria-label="Orders at a glance" hidden>
+        <button type="button" class="tile" data-go="orders" data-filter="awaiting_payment"><span>Orders awaiting payment</span><strong id="tAwaiting">0</strong></button>
+        <button type="button" class="tile" data-go="warehouse"><span>To pack</span><strong id="tPack">0</strong></button>
+        <button type="button" class="tile" data-go="schedule"><span>Installs this week</span><strong id="tInstalls">0</strong></button>
+        <button type="button" class="tile" data-go="products" data-filter="low"><span>Low-stock items</span><strong id="tLow">0</strong></button>
+        <button type="button" class="tile" data-go="service" data-filter="overdue" hidden><span>Overdue tickets</span><strong id="tOverdue">0</strong></button>
+      </section>
+
       <!-- Stats -->
-      <section class="stats">
+      <section class="stats" aria-label="Summary">
         <div class="stat"><span>Total leads</span><strong id="sTotal">0</strong></div>
-        <div class="stat stat--accent"><span>New (not contacted)</span><strong id="sNew">0</strong></div>
+        <div class="stat stat--accent"><span>New</span><strong id="sNew">0</strong></div>
         <div class="stat"><span>Last 7 days</span><strong id="sWeek">0</strong></div>
         <div class="stat"><span>Meetings today</span><strong id="sMeetToday">0</strong></div>
         <div class="stat"><span>Won</span><strong id="sWon">0</strong></div>
         <div class="stat"><span>Conversion</span><strong id="sConv">0%</strong></div>
       </section>
 
-      <!-- Upcoming meetings -->
-      <section class="upcoming" id="upcoming" hidden>
-        <div class="upcoming__head">
-          <h2>Upcoming meetings</h2>
-          <span class="muted" id="upcomingCount"></span>
-        </div>
-        <ol class="upcoming__list" id="upcomingList"></ol>
+      <div class="layout">
+        <section class="card leads">
+          <!-- Stage tabs -->
+          <nav class="tabs" id="pipeline" aria-label="Filter by stage"></nav>
+
+          <!-- Toolbar -->
+          <div class="toolbar">
+            <input type="search" id="search" placeholder="Search name, phone, area or email" aria-label="Search leads">
+            <select id="dateFilter" aria-label="Filter by date">
+              <option value="all">All time</option>
+              <option value="1">Today</option>
+              <option value="7">Last 7 days</option>
+              <option value="30">Last 30 days</option>
+            </select>
+          </div>
+
+          <!-- Table -->
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Lead</th>
+                  <th>Needs</th>
+                  <th>Stage</th>
+                  <th>AI call</th>
+                  <th>Next step</th>
+                  <th class="right">Received</th>
+                </tr>
+              </thead>
+              <tbody id="rows"></tbody>
+            </table>
+            <p class="empty" id="emptyState" hidden>No leads match these filters.</p>
+          </div>
+        </section>
+
+        <!-- Upcoming meetings -->
+        <aside class="card upcoming" id="upcoming">
+          <div class="upcoming__head">
+            <h2>Upcoming</h2>
+            <span class="muted" id="upcomingCount"></span>
+          </div>
+          <ol class="upcoming__list" id="upcomingList"></ol>
+        </aside>
+      </div>
       </section>
 
-      <!-- Pipeline filter -->
-      <nav class="pipeline" id="pipeline" aria-label="Filter by status"></nav>
+      <!-- Orders -->
+      <section class="view" data-view="orders" hidden>
+        <div class="page-head">
+          <div>
+            <h1>Orders</h1>
+            <p class="muted">Accepted final quotes: payments, packing and installation.</p>
+          </div>
+          <div class="page-actions">
+            <button type="button" class="btn btn--ghost btn--sm" id="ordersRefresh">↻ Refresh</button>
+          </div>
+        </div>
+        <section class="card">
+          <nav class="tabs" id="orderTabs" aria-label="Filter by status"></nav>
+          <div class="toolbar">
+            <input type="search" id="orderSearch" placeholder="Search order no, client ID or name" aria-label="Search orders">
+          </div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>Client</th>
+                  <th>System</th>
+                  <th>Status</th>
+                  <th>Paid</th>
+                  <th class="right">Installation</th>
+                </tr>
+              </thead>
+              <tbody id="orderRows"></tbody>
+            </table>
+            <p class="empty" id="ordersEmpty" hidden></p>
+          </div>
+        </section>
+      </section>
 
-      <!-- Toolbar -->
-      <div class="toolbar">
-        <input type="search" id="search" placeholder="Search name, phone, area or email" aria-label="Search leads">
-        <select id="dateFilter" aria-label="Filter by date">
-          <option value="all">All time</option>
-          <option value="1">Today</option>
-          <option value="7">Last 7 days</option>
-          <option value="30">Last 30 days</option>
-        </select>
-        <div class="toolbar__spacer"></div>
-        <button class="btn btn--ghost" id="refreshBtn">Refresh</button>
-        <button class="btn btn--ghost" id="exportBtn">Export CSV</button>
-        <button class="btn btn--primary" id="addBtn">+ Add lead</button>
-      </div>
+      <!-- Warehouse: packing lists and stock (no prices, no phone numbers) -->
+      <section class="view" data-view="warehouse" hidden>
+        <div class="page-head">
+          <div>
+            <h1>Warehouse</h1>
+            <p class="muted">Packing lists appear here as soon as an order is confirmed.</p>
+          </div>
+          <div class="page-actions">
+            <button type="button" class="btn btn--ghost btn--sm" id="whRefresh">↻ Refresh</button>
+          </div>
+        </div>
+        <section class="card">
+          <nav class="tabs" id="whTabs" aria-label="Warehouse sections"></nav>
+          <div class="wh-body" id="whBody"></div>
+        </section>
+      </section>
 
-      <!-- Table -->
-      <div class="table-wrap">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Received</th>
-              <th>Name</th>
-              <th>Phone</th>
-              <th>Location</th>
-              <th>Bill</th>
-              <th>Size / type</th>
-              <th>Call time</th>
-              <th>Status</th>
-              <th>AI call</th>
-              <th>Follow-up</th>
-            </tr>
-          </thead>
-          <tbody id="rows"></tbody>
-        </table>
-        <p class="empty" id="emptyState" hidden>No leads match these filters.</p>
+      <!-- Installation schedule -->
+      <section class="view" data-view="schedule" hidden>
+        <div class="page-head">
+          <div>
+            <h1>Schedule</h1>
+            <p class="muted" id="schedWeek"></p>
+          </div>
+          <div class="page-actions">
+            <button type="button" class="btn btn--ghost btn--sm" id="schedPrev" aria-label="Previous week">← Prev</button>
+            <button type="button" class="btn btn--ghost btn--sm" id="schedToday">This week</button>
+            <button type="button" class="btn btn--ghost btn--sm" id="schedNext" aria-label="Next week">Next →</button>
+          </div>
+        </div>
+        <section class="card week-wrap" id="schedBody"></section>
+      </section>
+
+      <!-- After-sales service -->
+      <section class="view" data-view="service" hidden>
+        <div class="page-head">
+          <div>
+            <h1>Service</h1>
+            <p class="muted">Breakdowns, warranty, response deadlines and pre-monsoon checkups.</p>
+          </div>
+          <div class="page-actions">
+            <button type="button" class="btn btn--ghost btn--sm" id="svcRefresh">↻ Refresh</button>
+            <button type="button" class="btn btn--ghost btn--sm" id="svcCampaignBtn">Pre-monsoon campaign</button>
+            <button type="button" class="btn btn--primary btn--sm" id="svcNewBtn">+ New ticket</button>
+          </div>
+        </div>
+        <section class="card svc-find">
+          <label><span>Customer calling? Find them and their units in seconds</span>
+            <input type="search" id="svcFind" placeholder="Serial number, phone, client ID or name" autocomplete="off" aria-label="Find a customer or serial number"></label>
+          <div id="svcFound"></div>
+        </section>
+        <div id="svcDash"></div>
+        <section class="card">
+          <nav class="tabs" id="svcTabs" aria-label="Filter tickets"></nav>
+          <div class="toolbar">
+            <input type="search" id="svcSearch" placeholder="Search ticket no, name, client ID, phone or area" aria-label="Search tickets">
+            <select id="svcKind" aria-label="Type"><option value="all">Breakdowns &amp; checkups</option><option value="breakdown">Breakdowns</option><option value="checkup">Checkups</option></select>
+          </div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Ticket</th>
+                  <th>Customer</th>
+                  <th>Priority</th>
+                  <th>Status</th>
+                  <th>Warranty</th>
+                  <th class="right">Opened</th>
+                </tr>
+              </thead>
+              <tbody id="svcRows"></tbody>
+            </table>
+            <p class="empty" id="svcEmpty" hidden></p>
+          </div>
+        </section>
+      </section>
+
+      <!-- Director's month-end dashboard (owner and managers) -->
+      <section class="view" data-view="director" hidden>
+        <div class="page-head">
+          <div>
+            <h1 id="dirTitle">Month-end</h1>
+            <p class="muted" id="dirSub">Sales, money, installations and service for the month, compared with the month before.</p>
+          </div>
+          <div class="page-actions dir-filter">
+            <div class="seg" id="dirPeriod" role="group" aria-label="Period">
+              <button type="button" data-period="today">Today</button><button type="button" data-period="week">This week</button><button type="button" data-period="month" class="is-active">Month</button>
+            </div>
+            <span id="dirMonthPicker" class="dir-month">
+              <button type="button" class="btn btn--ghost btn--sm" id="dirPrev" aria-label="Previous month">←</button>
+              <input type="month" id="dirMonth" aria-label="Month">
+              <button type="button" class="btn btn--ghost btn--sm" id="dirNext" aria-label="Next month">→</button>
+            </span>
+            <button type="button" class="btn btn--ghost btn--sm" id="dirCsv">CSV</button>
+            <button type="button" class="btn btn--primary btn--sm" id="dirPdf">Month-end report (PDF)</button>
+          </div>
+        </div>
+        <div id="dirBody" class="dir-body"><p class="empty">Loading…</p></div>
+        <div class="dtip" id="dirTip" role="tooltip" hidden></div>
+      </section>
+
+      <!-- PM Surya Ghar subsidy paperwork -->
+      <section class="view" data-view="subsidy" hidden>
+        <div class="page-head">
+          <div>
+            <h1>Subsidy</h1>
+            <p class="muted" id="subSub">PM Surya Ghar paperwork for every customer with a subsidy.</p>
+          </div>
+        </div>
+        <section class="card">
+          <nav class="tabs" id="subTabs" aria-label="Filter by step"></nav>
+          <div class="toolbar"><input type="search" id="subSearch" placeholder="Search name, client ID, order or application no" aria-label="Search subsidy cases"></div>
+          <div id="subBody"></div>
+        </section>
+      </section>
+
+      <!-- Technician hours and pay (owner and managers) -->
+      <section class="view" data-view="team" hidden>
+        <div class="page-head">
+          <div>
+            <h1>Team &amp; pay</h1>
+            <p class="muted">Hours come from the installation and service forms; correct them here before paying.</p>
+          </div>
+          <div class="page-actions"><input type="month" id="teamMonth" aria-label="Month" class="month-input"></div>
+        </div>
+        <div id="teamBody" class="dir-body"><p class="empty">Loading…</p></div>
+      </section>
+
+      <!-- Products -->
+      <section class="view" data-view="products" hidden>
+        <div class="page-head">
+          <div>
+            <h1>Products</h1>
+            <p class="muted" id="productsSub">Prices and stock. Stock only changes through "+ Stock" / "Adjust" and orders.</p>
+          </div>
+          <div class="page-actions">
+            <button type="button" class="btn btn--ghost btn--sm" id="purchaseBtn">Record purchase</button>
+            <button type="button" class="btn btn--primary btn--sm" id="addProductBtn">+ Add product</button>
+          </div>
+        </div>
+        <section class="card">
+          <div class="toolbar">
+            <input type="search" id="productSearch" placeholder="Search name or SKU" aria-label="Search products">
+            <select id="productCategory" aria-label="Filter by category"></select>
+            <label class="check toolbar__check"><input type="checkbox" id="productLow"> Low stock only</label>
+          </div>
+          <div class="table-wrap">
+            <table class="table table--products">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th class="right">Price</th>
+                  <th class="right">In stock</th>
+                  <th class="right">Reserved</th>
+                  <th class="right">Available</th>
+                  <th class="right"></th>
+                </tr>
+              </thead>
+              <tbody id="productRows"></tbody>
+            </table>
+            <p class="empty" id="productsEmpty" hidden></p>
+          </div>
+        </section>
+        <section class="card dcard purchase-block" id="purchaseBlock" hidden>
+          <h3>Recent purchases <small class="muted">· stock in from supplier bills</small></h3>
+          <div id="purchaseList"></div>
+        </section>
+      </section>
+
+      <!-- Kit templates -->
+      <section class="view" data-view="kits" hidden>
+        <div class="page-head">
+          <div>
+            <h1>Kit templates</h1>
+            <p class="muted">The parts list behind every final quote. The approved survey picks the nearest kit and fills in panels and cable lengths.</p>
+          </div>
+          <div class="page-actions">
+            <button type="button" class="btn btn--primary btn--sm" id="addKitBtn">+ New template</button>
+          </div>
+        </div>
+        <div class="kit-grid" id="kitList"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Engineer portal: only assigned site surveys -->
+  <div class="app" id="engineerView" hidden>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand__mark" aria-hidden="true"></span>
+        <span>Sun Power <b>Surveys</b></span>
       </div>
+      <div class="topbar__right">
+        <span class="topbar__user" id="engUser"></span>
+        <button type="button" class="link-btn" id="engLogout">Sign out</button>
+      </div>
+    </header>
+    <main class="main eng-main">
+      <div class="page-head">
+        <div>
+          <h1>My surveys</h1>
+          <p class="muted" id="engSub"></p>
+        </div>
+        <button type="button" class="btn btn--ghost btn--sm" id="engRefresh">↻ Refresh</button>
+      </div>
+      <ol class="survey-list eng-list" id="engList"></ol>
+    </main>
+  </div>
+
+  <!-- Technician portal: only their crew's installation jobs -->
+  <div class="app" id="techView" hidden>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand__mark" aria-hidden="true"></span>
+        <span>Sun Power <b>Installs</b></span>
+      </div>
+      <div class="topbar__right">
+        <span class="topbar__user" id="techUser"></span>
+        <button type="button" class="link-btn" id="techLogout">Sign out</button>
+      </div>
+    </header>
+    <main class="main eng-main">
+      <div class="page-head">
+        <div>
+          <h1>My jobs</h1>
+          <p class="muted" id="techSub"></p>
+        </div>
+        <button type="button" class="btn btn--ghost btn--sm" id="techRefresh">↻ Refresh</button>
+      </div>
+      <ol class="survey-list tech-list" id="techList"></ol>
+      <section id="techVisitsBlock" hidden>
+        <h2 class="tech-h2">Service visits</h2>
+        <ol class="survey-list tech-list" id="techVisits"></ol>
+      </section>
     </main>
   </div>
 
@@ -116,99 +419,155 @@
     <div class="drawer__backdrop" data-close></div>
     <aside class="drawer__panel" role="dialog" aria-modal="true" aria-labelledby="dName">
       <header class="drawer__head">
-        <div>
-          <h2 id="dName"></h2>
+        <div class="drawer__title">
+          <div class="drawer__name">
+            <h2 id="dName"></h2>
+            <span class="badge" id="dStage"></span>
+          </div>
           <p class="muted" id="dMeta"></p>
+          <div class="quick">
+            <a class="btn btn--primary btn--sm" id="dCall">Call</a>
+            <a class="btn btn--ghost btn--sm" id="dWhatsApp" target="_blank" rel="noopener">WhatsApp</a>
+            <a class="btn btn--ghost btn--sm" id="dEmail">Email</a>
+            <button type="button" class="btn btn--ghost btn--sm" id="dPortal" title="Private link for the customer to see their system and report problems">Portal link</button>
+            <button type="button" class="btn btn--ghost btn--sm" id="dPassport" title="The customer's Localhost users login (phone number + password)">Localhost users</button>
+          </div>
         </div>
         <button class="icon-btn" data-close aria-label="Close">✕</button>
       </header>
 
+      <nav class="tabs tabs--drawer" id="dTabs" aria-label="Lead sections">
+        <button type="button" data-pane="overview" class="is-active">Overview</button>
+        <button type="button" data-pane="calls">AI calls</button>
+        <button type="button" data-pane="deal">Survey &amp; quote</button>
+        <button type="button" data-pane="meetings">Meetings</button>
+        <button type="button" data-pane="activity">Activity</button>
+      </nav>
+
       <div class="drawer__body">
-        <div class="quick">
-          <a class="btn btn--primary btn--sm" id="dCall">Call</a>
-          <a class="btn btn--ghost btn--sm" id="dWhatsApp" target="_blank" rel="noopener">WhatsApp</a>
-          <a class="btn btn--ghost btn--sm" id="dEmail">Email</a>
-        </div>
+        <!-- Overview -->
+        <section class="pane" data-pane="overview">
+          <div class="block">
+            <h3>Details</h3>
+            <dl class="details" id="dDetails"></dl>
+          </div>
 
-        <h3>Details</h3>
-        <dl class="details" id="dDetails"></dl>
+          <div class="block">
+            <h3>Requirements</h3>
+            <form class="manage" id="reqForm">
+              <label><span>Owns property</span>
+                <select name="owns_property"><option value="">—</option><option>Yes</option><option>No</option><option>Unknown</option></select>
+              </label>
+              <label><span>Roof type</span><input name="roof_type" placeholder="RCC, sheet, tiled…"></label>
+              <label><span>Roof area</span><input name="roof_area" placeholder="e.g. 400 sq ft"></label>
+              <label><span>Shading</span><input name="shading" placeholder="e.g. none, tree on east side"></label>
+              <label><span>Install timeline</span><input name="install_timeline" placeholder="e.g. within a month"></label>
+              <label><span>Grid connection suitable?</span>
+                <select name="grid_ok"><option value="">—</option><option>Yes</option><option>No</option><option>Unknown</option></select>
+              </label>
+              <label class="span-2"><span>Full address</span><input name="address" maxlength="300" placeholder="House no, street, area, city, PIN"></label>
+              <label class="span-2"><span>Notes</span><textarea name="requirement_notes" rows="2" placeholder="Anything else the team should know"></textarea></label>
+              <div class="form-foot span-2">
+                <button type="submit" class="btn btn--ghost btn--sm">Save requirements</button>
+                <span class="saved" id="reqSaved" role="status"></span>
+              </div>
+            </form>
+          </div>
 
-        <h3>Requirements</h3>
-        <form class="manage" id="reqForm">
-          <label><span>Owns property</span>
-            <select name="owns_property"><option value="">—</option><option>Yes</option><option>No</option><option>Unknown</option></select>
-          </label>
-          <label><span>Roof type</span><input name="roof_type" placeholder="RCC, sheet, tiled…"></label>
-          <label><span>Roof area</span><input name="roof_area" placeholder="e.g. 400 sq ft"></label>
-          <label><span>Shading</span><input name="shading" placeholder="e.g. none, tree on east side"></label>
-          <label><span>Install timeline</span><input name="install_timeline" placeholder="e.g. within a month"></label>
-          <label class="span-2"><span>Notes</span><textarea name="requirement_notes" rows="2" placeholder="Anything else the team should know"></textarea></label>
-          <button type="submit" class="btn btn--primary">Save requirements</button>
-          <span class="saved" id="reqSaved" role="status"></span>
-        </form>
+          <div class="block">
+            <h3>Manage</h3>
+            <form class="manage" id="manageForm">
+              <label>
+                <span>Stage</span>
+                <select name="status" id="dStatus"></select>
+              </label>
+              <label>
+                <span>Follow-up date</span>
+                <input type="date" name="follow_up_date">
+              </label>
+              <label>
+                <span>Assigned to</span>
+                <select name="assigned_to" id="dAssigned"></select>
+              </label>
+              <label>
+                <span>Deal value (₹)</span>
+                <input type="number" name="deal_value" min="0" step="1" placeholder="e.g. 180000">
+              </label>
+              <div class="form-foot span-2">
+                <button type="submit" class="btn btn--primary btn--sm">Save changes</button>
+                <span class="saved" id="savedMsg" role="status"></span>
+              </div>
+            </form>
+          </div>
+        </section>
 
-        <div class="section-head">
-          <h3>Quotation</h3>
-          <button type="button" class="btn btn--primary btn--sm" id="prepareQuoteBtn">Prepare quote</button>
-        </div>
-        <div id="quoteBox"></div>
-        <ol class="quotes" id="quotesList"></ol>
+        <!-- AI calls -->
+        <section class="pane" data-pane="calls" hidden>
+          <div class="section-head">
+            <h3>AI calls</h3>
+            <button type="button" class="btn btn--ghost btn--sm" id="aiCallBtn">Call with AI now</button>
+          </div>
+          <ol class="calls" id="calls"></ol>
+        </section>
 
-        <div class="section-head">
-          <h3>Meetings</h3>
-          <button type="button" class="btn btn--ghost btn--sm" id="addMeetingBtn">+ Schedule</button>
-        </div>
-        <form class="manage meeting-form" id="meetingForm" hidden>
-          <label><span>Type</span>
-            <select name="type"><option value="site_survey">Site survey</option><option value="callback">Callback</option><option value="meeting">Meeting</option></select>
-          </label>
-          <label><span>Date</span><input type="date" name="scheduled_date" required></label>
-          <label><span>Time / slot</span><input name="time_slot" placeholder="e.g. Morning 10–1"></label>
-          <label class="span-2"><span>Agenda</span><textarea name="agenda" rows="2" placeholder="What is this meeting for?"></textarea></label>
-          <button type="submit" class="btn btn--primary">Save meeting</button>
-        </form>
-        <ol class="meetings" id="meetings"></ol>
+        <!-- Survey & quote -->
+        <section class="pane" data-pane="deal" hidden>
+          <div class="block">
+            <h3>Site survey</h3>
+            <ol class="quotes" id="leadSurveys"></ol>
+          </div>
+          <div class="block">
+            <div class="section-head">
+              <h3>Quotation</h3>
+              <button type="button" class="btn btn--primary btn--sm" id="prepareQuoteBtn">Prepare quote</button>
+            </div>
+            <div id="quoteBox"></div>
+            <ol class="quotes" id="quotesList"></ol>
+          </div>
+          <div class="block" id="leadOrderBlock" hidden>
+            <h3>Order</h3>
+            <ol class="quotes" id="leadOrders"></ol>
+          </div>
+          <div class="block" id="leadServiceBlock" hidden>
+            <div class="section-head">
+              <h3>Service requests</h3>
+              <button type="button" class="btn btn--ghost btn--sm" id="leadNewTicket">+ New ticket</button>
+            </div>
+            <ol class="quotes" id="leadTickets"></ol>
+          </div>
+        </section>
 
-        <h3>Manage</h3>
-        <form class="manage" id="manageForm">
-          <label>
-            <span>Status</span>
-            <select name="status" id="dStatus"></select>
-          </label>
-          <label>
-            <span>Follow-up date</span>
-            <input type="date" name="follow_up_date">
-          </label>
-          <label>
-            <span>Assigned to</span>
-            <select name="assigned_to" id="dAssigned"></select>
-          </label>
-          <label>
-            <span>Deal value (₹)</span>
-            <input type="number" name="deal_value" min="0" step="1" placeholder="e.g. 180000">
-          </label>
-          <button type="submit" class="btn btn--primary">Save changes</button>
-          <span class="saved" id="savedMsg" role="status"></span>
-        </form>
+        <!-- Meetings -->
+        <section class="pane" data-pane="meetings" hidden>
+          <div class="section-head">
+            <h3>Meetings</h3>
+            <button type="button" class="btn btn--ghost btn--sm" id="addMeetingBtn">+ Schedule</button>
+          </div>
+          <form class="manage meeting-form" id="meetingForm" hidden>
+            <label><span>Type</span>
+              <select name="type"><option value="site_survey">Site survey</option><option value="callback">Callback</option><option value="meeting">Meeting</option></select>
+            </label>
+            <label><span>Date</span><input type="date" name="scheduled_date" required></label>
+            <label><span>Time / slot</span><input name="time_slot" placeholder="e.g. Morning 10–1"></label>
+            <label class="span-2"><span>Agenda</span><textarea name="agenda" rows="2" placeholder="What is this meeting for?"></textarea></label>
+            <div class="form-foot span-2"><button type="submit" class="btn btn--primary btn--sm">Save meeting</button></div>
+          </form>
+          <ol class="meetings" id="meetings"></ol>
+        </section>
 
-        <div class="section-head">
-          <h3>AI calls</h3>
-          <button type="button" class="btn btn--dark btn--sm" id="aiCallBtn">Call with AI now</button>
-        </div>
-        <ol class="calls" id="calls"></ol>
-
-        <h3>Activity</h3>
-        <form class="note-form" id="noteForm">
-          <select name="type" aria-label="Activity type">
-            <option value="note">Note</option>
-            <option value="call">Call log</option>
-          </select>
-          <textarea name="body" rows="2" placeholder="Add a note or call summary…" required></textarea>
-          <button type="submit" class="btn btn--dark btn--sm">Add</button>
-        </form>
-        <ol class="timeline" id="timeline"></ol>
-
-        <button class="danger-link" id="deleteBtn">Delete this lead</button>
+        <!-- Activity -->
+        <section class="pane" data-pane="activity" hidden>
+          <form class="note-form" id="noteForm">
+            <select name="type" aria-label="Activity type">
+              <option value="note">Note</option>
+              <option value="call">Call log</option>
+            </select>
+            <textarea name="body" rows="2" placeholder="Add a note or call summary…" required></textarea>
+            <button type="submit" class="btn btn--dark btn--sm">Add</button>
+          </form>
+          <ol class="timeline" id="timeline"></ol>
+          <button class="danger-link" id="deleteBtn">Delete this lead</button>
+        </section>
       </div>
     </aside>
   </div>
@@ -239,6 +598,96 @@
       <label class="check"><input type="checkbox" name="consent" required> Customer agreed to be contacted *</label>
       <button type="submit" class="btn btn--primary btn--block">Add lead</button>
       <p class="login__error" id="addError" role="alert"></p>
+    </form>
+  </div>
+
+  <!-- Surveys list (engineers: my surveys; managers: approvals) -->
+  <div class="modal" id="surveysModal" hidden>
+    <div class="drawer__backdrop" data-close-surveys></div>
+    <div class="modal__card modal__card--wide">
+      <header class="drawer__head">
+        <div>
+          <h2>Site surveys</h2>
+          <p class="muted" id="surveysSub"></p>
+        </div>
+        <button type="button" class="icon-btn" data-close-surveys aria-label="Close">✕</button>
+      </header>
+      <nav class="pipeline survey-tabs" id="surveyTabs"></nav>
+      <ol class="survey-list" id="surveyList"></ol>
+    </div>
+  </div>
+
+  <!-- Survey form (works on a phone) -->
+  <div class="modal" id="surveyModal" hidden>
+    <div class="drawer__backdrop" data-close-survey></div>
+    <form class="modal__card modal__card--wide survey-form" id="surveyForm">
+      <header class="drawer__head">
+        <div>
+          <h2 id="sfTitle">Site survey</h2>
+          <p class="muted" id="sfMeta"></p>
+        </div>
+        <button type="button" class="icon-btn" data-close-survey aria-label="Close">✕</button>
+      </header>
+
+      <p class="quote-warn" id="sfReviewNote" hidden></p>
+
+      <h3 class="form-section">Visit</h3>
+      <div class="modal__grid">
+        <label><span>Date of visit</span><input type="date" name="visited_at"></label>
+        <label><span>Engineer</span><input name="engineer_email" readonly></label>
+      </div>
+
+      <h3 class="form-section">Roof</h3>
+      <div class="modal__grid modal__grid--3">
+        <label><span>Roof faces (direction)</span>
+          <select name="roof_direction"><option value="">—</option><option>South</option><option>South-East</option><option>South-West</option><option>East</option><option>West</option><option>North</option><option>Flat roof (any)</option></select>
+        </label>
+        <label><span>Tilt</span><input name="roof_tilt" placeholder="e.g. flat, 10°, 20°"></label>
+        <label><span>Roof type</span>
+          <select name="roof_type"><option value="">—</option><option>RCC (concrete)</option><option>Metal sheet</option><option>Tiled</option><option>Asbestos</option><option>Ground mount</option></select>
+        </label>
+        <label><span>Usable shade-free area (sq ft)</span><input type="number" min="0" step="1" name="usable_area_sqft" inputmode="numeric"></label>
+        <label><span>Roof condition</span>
+          <select name="roof_condition"><option value="">—</option><option>Good</option><option>Needs minor repair</option><option>Needs waterproofing</option><option>Weak / not suitable</option></select>
+        </label>
+        <label><span>Structure height needed</span>
+          <select name="structure_height"><option value="">—</option><option>Standard (low)</option><option>Elevated (above water tank / parking)</option><option>Custom</option></select>
+        </label>
+      </div>
+      <label><span>Shading (what and when)</span><input name="shading" placeholder="e.g. tree on west side after 3 PM, none"></label>
+
+      <h3 class="form-section">Electrical &amp; cabling</h3>
+      <div class="modal__grid modal__grid--3">
+        <label><span>DC cable: panels → inverter (m)</span><input type="number" min="0" step="1" name="dc_cable_m" inputmode="numeric"></label>
+        <label><span>AC cable: inverter → meter (m)</span><input type="number" min="0" step="1" name="ac_cable_m" inputmode="numeric"></label>
+        <label><span>Meter phase</span>
+          <select name="phase"><option value="">—</option><option>Single phase</option><option>Three phase</option></select>
+        </label>
+        <label><span>Sanctioned load (kW)</span><input type="number" min="0" step="0.1" name="sanctioned_load_kw" inputmode="decimal"></label>
+        <label><span>Inverter location</span><input name="inverter_location" placeholder="e.g. staircase wall"></label>
+        <label><span>Earthing location</span><input name="earthing_location" placeholder="e.g. garden, north side"></label>
+      </div>
+
+      <h3 class="form-section">Recommendation</h3>
+      <div class="modal__grid modal__grid--3">
+        <label><span>System type</span>
+          <select name="system_type"><option value="">—</option><option value="on_grid">On-grid</option><option value="hybrid">Hybrid (with battery)</option><option value="off_grid">Off-grid (battery)</option><option value="panel_set">Solar panel set only (no inverter)</option></select>
+        </label>
+        <label><span>Number of panels</span><input type="number" min="1" step="1" name="panel_count" inputmode="numeric"></label>
+        <label><span>System size (kW)</span><input type="number" min="0" step="0.01" name="recommended_kw" inputmode="decimal" placeholder="auto from panels"></label>
+      </div>
+      <label><span>Notes for the manager</span><textarea name="notes" rows="3" placeholder="Anything that affects price or installation"></textarea></label>
+
+      <h3 class="form-section">Photos</h3>
+      <p class="muted">Roof, meter, electrical panel and any shading. You can take photos straight from the phone camera.</p>
+      <div class="photos" id="sfPhotos"></div>
+      <label class="btn btn--ghost photo-add" id="sfPhotoAdd">
+        + Add photos
+        <input type="file" accept="image/*" capture="environment" multiple hidden id="sfPhotoInput">
+      </label>
+
+      <div class="survey-actions" id="sfActions"></div>
+      <p class="login__error" id="sfError" role="alert"></p>
     </form>
   </div>
 
@@ -276,6 +725,58 @@
       </div>
       <label class="check"><input type="checkbox" name="apply_subsidy"> Show PM Surya Ghar subsidy on home quotes (on-grid &amp; hybrid)</label>
 
+      <h3 class="form-section">Approximate estimate (sent on WhatsApp after the AI call)</h3>
+      <div class="modal__grid modal__grid--3">
+        <label><span>Price band ± %</span><input type="number" min="0" max="50" step="any" name="estimate_margin_percent" placeholder="10"></label>
+      </div>
+
+      <h3 class="form-section">Parts &amp; prices (final quote after the site survey)</h3>
+      <div class="modal__grid modal__grid--3">
+        <label><span>Panel model</span><input name="panel_model"></label>
+        <label><span>Panel wattage (Wp)</span><input type="number" min="1" step="1" name="panel_watt"></label>
+        <label><span>Price per panel (₹)</span><input type="number" min="0" step="1" name="panel_price"></label>
+        <label><span>On-grid inverter (₹ per kW)</span><input type="number" min="0" step="1" name="inverter_on_grid_per_kw"></label>
+        <label><span>Hybrid inverter (₹ per kW)</span><input type="number" min="0" step="1" name="inverter_hybrid_per_kw"></label>
+        <label><span>Battery size (kWh per kW)</span><input type="number" min="0" step="any" name="battery_kwh_per_kw"></label>
+        <label><span>Battery (₹ per kWh)</span><input type="number" min="0" step="1" name="battery_price_per_kwh"></label>
+        <label><span>Structure (₹ per kW)</span><input type="number" min="0" step="1" name="structure_per_kw"></label>
+        <label><span>Elevated structure extra (₹ per kW)</span><input type="number" min="0" step="1" name="structure_elevated_per_kw"></label>
+        <label><span>DC cable (₹ per m)</span><input type="number" min="0" step="1" name="dc_cable_per_m"></label>
+        <label><span>AC cable (₹ per m)</span><input type="number" min="0" step="1" name="ac_cable_per_m"></label>
+        <label><span>ACDB &amp; DCDB (₹)</span><input type="number" min="0" step="1" name="acdb_dcdb"></label>
+        <label><span>Earthing kit (₹)</span><input type="number" min="0" step="1" name="earthing_kit"></label>
+        <label><span>Lightning arrestor (₹)</span><input type="number" min="0" step="1" name="lightning_arrestor"></label>
+        <label><span>Installation (₹ per kW)</span><input type="number" min="0" step="1" name="installation_per_kw"></label>
+      </div>
+
+      <h3 class="form-section">Orders &amp; payments</h3>
+      <div class="modal__grid modal__grid--3">
+        <label><span>Advance to confirm an order (%)</span><input type="number" min="0" max="100" step="any" name="advance_percent" placeholder="30"></label>
+        <label class="span-2"><span>UPI ID (for payment links and QR codes)</span><input name="upi_id" placeholder="e.g. sunpowersolar@okaxis"></label>
+      </div>
+      <label><span>Bank details (on receipts and payment messages)</span><textarea name="bank_details" rows="3" placeholder="Account name: Sun Power Solar Solutions&#10;A/c no: …&#10;IFSC: …&#10;Bank &amp; branch: …"></textarea></label>
+
+      <h3 class="form-section">After-sales service</h3>
+      <div class="modal__grid modal__grid--3">
+        <label><span>Workmanship warranty (months)</span><input type="number" min="0" step="1" name="workmanship_warranty_months" placeholder="60"></label>
+        <label><span>Service visit charge, out of warranty (₹)</span><input type="number" min="0" step="1" name="service_visit_charge" placeholder="500"></label>
+      </div>
+
+      <h3 class="form-section">Invoices &amp; costs</h3>
+      <div class="modal__grid modal__grid--3">
+        <label><span>Invoice number prefix</span><input name="invoice_prefix" placeholder="SP"></label>
+        <label><span>Your state (place of supply)</span><input name="company_state" placeholder="Telangana"></label>
+        <label><span>Crew cost per hour (₹, default)</span><input type="number" min="0" step="1" name="labour_cost_per_hour" placeholder="150"></label>
+        <label><span>SAC for installation lines</span><input name="installation_sac" placeholder="9954"></label>
+        <label><span>SAC for repair visits</span><input name="service_sac" placeholder="9987"></label>
+      </div>
+      <p class="muted">Check the GSTIN above and the HSN/SAC codes with your accountant before issuing invoices.</p>
+
+      <h3 class="form-section">WhatsApp enquiries</h3>
+      <label class="check"><input type="checkbox" name="whatsapp_new_leads"> Create a lead when a new number messages us on WhatsApp</label>
+      <label class="check"><input type="checkbox" name="whatsapp_new_lead_ai_call"> …and let the AI agent call those new leads</label>
+      <label><span>Localhost users address (sent to customers with their login)</span><input name="portal_url" placeholder="https://your-website/portal/"></label>
+
       <h3 class="form-section">Components</h3>
       <div class="modal__grid">
         <label><span>Solar panels</span><input name="panel" placeholder="e.g. 540 Wp Mono PERC, Tier-1 (brand)"></label>
@@ -307,12 +808,450 @@
     </form>
   </div>
 
+  <!-- Order -->
+  <div class="modal" id="orderModal" hidden>
+    <div class="drawer__backdrop" data-close-order></div>
+    <div class="modal__card modal__card--wide">
+      <header class="drawer__head">
+        <div>
+          <h2 id="oTitle">Order</h2>
+          <p class="muted" id="oMeta"></p>
+        </div>
+        <button type="button" class="icon-btn" data-close-order aria-label="Close">✕</button>
+      </header>
+      <div class="order-body" id="oBody"></div>
+    </div>
+  </div>
+
+  <!-- Reschedule an installation -->
+  <div class="modal" id="jobModal" hidden>
+    <div class="drawer__backdrop" data-close-job></div>
+    <form class="modal__card" id="jobForm">
+      <header class="drawer__head">
+        <div>
+          <h2 id="jobTitle">Reschedule</h2>
+          <p class="muted" id="jobMeta"></p>
+        </div>
+        <button type="button" class="icon-btn" data-close-job aria-label="Close">✕</button>
+      </header>
+      <div class="modal__grid modal__grid--3">
+        <label><span>Date</span><input type="date" name="scheduled_date" required></label>
+        <label><span>Slot</span>
+          <select name="time_slot"><option>Morning 9–1</option><option>Afternoon 2–6</option><option>Full day</option></select>
+        </label>
+        <label><span>Crew</span><select name="crew_id"></select></label>
+      </div>
+      <p class="quote-warn" id="jobWarn" hidden></p>
+      <label><span>Reason for the change *</span><input name="reason" placeholder="e.g. customer asked for Saturday, rain"></label>
+      <button type="submit" class="btn btn--primary btn--block" id="jobSave">Save</button>
+      <p class="login__error" id="jobError" role="alert"></p>
+    </form>
+  </div>
+
+  <!-- Add / edit product -->
+  <div class="modal" id="productModal" hidden>
+    <div class="drawer__backdrop" data-close-product></div>
+    <form class="modal__card modal__card--wide" id="productForm">
+      <header class="drawer__head">
+        <h2 id="productTitle">Product</h2>
+        <button type="button" class="icon-btn" data-close-product aria-label="Close">✕</button>
+      </header>
+      <div class="modal__grid modal__grid--3">
+        <label><span>SKU *</span><input name="sku" required maxlength="40" placeholder="e.g. PNL-540-T1"></label>
+        <label class="span-2"><span>Name *</span><input name="name" required></label>
+        <label><span>Category</span><select name="category"></select></label>
+        <label><span>Unit</span><select name="unit"></select></label>
+        <label><span>Warranty (months)</span><input type="number" name="warranty_months" min="0" step="1"></label>
+        <label><span>Cost price (₹, excl. GST)</span><input type="number" name="cost_price" min="0" step="0.01"></label>
+        <label><span>Sell price (₹, excl. GST)</span><input type="number" name="sell_price" min="0" step="0.01" required></label>
+        <label><span>GST %</span><input type="number" name="gst_percent" min="0" max="28" step="any"></label>
+        <label><span>Low-stock level</span><input type="number" name="low_stock_level" min="0" step="any"></label>
+        <label><span>Opening stock</span><input type="number" name="opening_stock" min="0" step="any" placeholder="0"></label>
+        <label><span>HSN / SAC code</span><input name="hsn_code" maxlength="8" inputmode="numeric" placeholder="e.g. 8541"></label>
+      </div>
+      <div class="check-row">
+        <label class="check"><input type="checkbox" name="serial_tracked"> Track serial numbers</label>
+        <label class="check"><input type="checkbox" name="is_service"> Service (never stocked)</label>
+        <label class="check"><input type="checkbox" name="active"> Active</label>
+      </div>
+      <button type="submit" class="btn btn--primary btn--block">Save product</button>
+      <p class="login__error" id="productError" role="alert"></p>
+      <div id="productHistory" hidden>
+        <h3 class="form-section">Stock history</h3>
+        <ol class="moves" id="productMoves"></ol>
+      </div>
+    </form>
+  </div>
+
+  <!-- Add stock / adjust -->
+  <div class="modal" id="stockModal" hidden>
+    <div class="drawer__backdrop" data-close-stock></div>
+    <form class="modal__card" id="stockForm">
+      <header class="drawer__head">
+        <div>
+          <h2 id="stockTitle">Stock</h2>
+          <p class="muted" id="stockMeta"></p>
+        </div>
+        <button type="button" class="icon-btn" data-close-stock aria-label="Close">✕</button>
+      </header>
+      <div class="modal__grid">
+        <label><span>Type</span>
+          <select name="type"><option value="purchase">Purchase (stock in)</option><option value="adjustment">Adjustment (+ / −)</option><option value="return">Return from site</option></select>
+        </label>
+        <label><span id="stockQtyLabel">Quantity</span><input type="number" name="qty" step="any" required></label>
+      </div>
+      <label><span>Note</span><input name="note"></label>
+      <button type="submit" class="btn btn--primary btn--block">Save</button>
+      <p class="login__error" id="stockError" role="alert"></p>
+      <h3 class="form-section">History</h3>
+      <ol class="moves" id="stockMoves"></ol>
+    </form>
+  </div>
+
+  <!-- Kit template editor -->
+  <div class="modal" id="kitModal" hidden>
+    <div class="drawer__backdrop" data-close-kit></div>
+    <form class="modal__card modal__card--wide" id="kitForm">
+      <header class="drawer__head">
+        <h2 id="kitTitle">Kit template</h2>
+        <button type="button" class="icon-btn" data-close-kit aria-label="Close">✕</button>
+      </header>
+      <div class="modal__grid modal__grid--3">
+        <label><span>Name *</span><input name="name" required placeholder="e.g. 3 kW On-Grid"></label>
+        <label><span>System type</span><select name="system_type"></select></label>
+        <label><span>Size (kW) *</span><input type="number" name="size_kw" min="0.5" step="0.5" required></label>
+      </div>
+      <label><span>Notes</span><input name="notes"></label>
+      <label class="check"><input type="checkbox" name="active"> Active (used for final quotes)</label>
+      <div class="table-wrap">
+        <table class="bom kit-items">
+          <thead><tr><th>Product</th><th>Quantity rule</th><th>Qty</th><th></th></tr></thead>
+          <tbody id="kitRows"></tbody>
+        </table>
+      </div>
+      <p class="muted">Per kW and per panel multiply by the survey's system size and panel count. Panels always use the engineer's panel count.</p>
+      <button type="button" class="btn btn--ghost btn--sm kit-add" id="kitAddItem">+ Add item</button>
+      <button type="submit" class="btn btn--primary btn--block">Save template</button>
+      <p class="login__error" id="kitError" role="alert"></p>
+    </form>
+  </div>
+
+  <!-- Service ticket -->
+  <div class="modal" id="ticketModal" hidden>
+    <div class="drawer__backdrop" data-close-ticket></div>
+    <div class="modal__card modal__card--wide">
+      <header class="drawer__head">
+        <div>
+          <h2 id="tkTitle">Ticket</h2>
+          <p class="muted" id="tkMeta"></p>
+        </div>
+        <button type="button" class="icon-btn" data-close-ticket aria-label="Close">✕</button>
+      </header>
+      <div class="order-body" id="tkBody"></div>
+    </div>
+  </div>
+
+  <!-- New service ticket -->
+  <div class="modal" id="newTicketModal" hidden>
+    <div class="drawer__backdrop" data-close-new-ticket></div>
+    <form class="modal__card" id="newTicketForm">
+      <header class="drawer__head">
+        <h2>New service ticket</h2>
+        <button type="button" class="icon-btn" data-close-new-ticket aria-label="Close">✕</button>
+      </header>
+      <p id="ntCustomer"></p>
+      <div id="ntPick">
+        <label><span>Customer</span><input name="q" id="ntQuery" placeholder="Search name, client ID or phone" autocomplete="off"></label>
+        <ul class="pick-list" id="ntResults"></ul>
+      </div>
+      <div class="modal__grid">
+        <label><span>Problem</span><select name="category"></select></label>
+        <label><span>Priority</span>
+          <select name="priority"><option value="">Automatic (by problem)</option><option value="urgent">Urgent (4 h)</option><option value="high">High (24 h)</option><option value="normal">Normal (3 days)</option><option value="low">Low (1 week)</option></select>
+        </label>
+      </div>
+      <label hidden><span>Which unit? (its own warranty decides free or chargeable)</span><select name="serial_id"></select></label>
+      <label><span>What the customer said</span><textarea name="description" rows="3"></textarea></label>
+      <button type="submit" class="btn btn--primary btn--block">Open ticket</button>
+      <p class="login__error" id="ntError" role="alert"></p>
+    </form>
+  </div>
+
+  <!-- Pre-monsoon checkup campaign -->
+  <div class="modal" id="campaignModal" hidden>
+    <div class="drawer__backdrop" data-close-campaign></div>
+    <form class="modal__card" id="campaignForm">
+      <header class="drawer__head">
+        <h2>Pre-monsoon checkup campaign</h2>
+        <button type="button" class="icon-btn" data-close-campaign aria-label="Close">✕</button>
+      </header>
+      <label><span>Name</span><input name="name" required></label>
+      <div class="modal__grid">
+        <label><span>From</span><input type="date" name="start_date" required></label>
+        <label><span>To</span><input type="date" name="end_date" required></label>
+      </div>
+      <p class="muted" id="campPreview"></p>
+      <button type="submit" class="btn btn--primary btn--block">Create checkups</button>
+      <p class="login__error" id="campError" role="alert"></p>
+    </form>
+  </div>
+
+  <!-- Customer portal link -->
+  <div class="modal" id="portalModal" hidden>
+    <div class="drawer__backdrop" data-close-portal></div>
+    <div class="modal__card">
+      <header class="drawer__head">
+        <h2>Customer portal link</h2>
+        <button type="button" class="icon-btn" data-close-portal aria-label="Close">✕</button>
+      </header>
+      <p class="muted">The customer opens this private link to see their system, warranty and payments, and to report problems. Send it only to the customer.</p>
+      <input id="portalLink" readonly>
+      <div class="m-actions">
+        <a class="btn btn--primary btn--sm" id="portalWa" target="_blank" rel="noopener">Send on WhatsApp</a>
+        <button type="button" class="btn btn--ghost btn--sm" id="portalCopy">Copy link</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Localhost users login (the customer's own login after the order is completed) -->
+  <div class="modal" id="passportModal" hidden>
+    <div class="drawer__backdrop" data-close-passport></div>
+    <div class="modal__card">
+      <header class="drawer__head">
+        <h2>Localhost users login</h2>
+        <button type="button" class="icon-btn" data-close-passport aria-label="Close">✕</button>
+      </header>
+      <div id="passportBody" class="pp-staff"></div>
+    </div>
+  </div>
+
+  <!-- Stock purchase (supplier bill) -->
+  <div class="modal" id="purchaseModal" hidden>
+    <div class="drawer__backdrop" data-close-purchase></div>
+    <form class="modal__card modal__card--wide" id="purchaseForm">
+      <header class="drawer__head">
+        <div>
+          <h2>Record a purchase</h2>
+          <p class="muted">Stock goes up; each product's cost price becomes the average of old stock and this bill.</p>
+        </div>
+        <button type="button" class="icon-btn" data-close-purchase aria-label="Close">✕</button>
+      </header>
+      <div class="modal__grid modal__grid--3">
+        <label><span>Supplier *</span><input name="supplier" required minlength="2"></label>
+        <label><span>Supplier GSTIN</span><input name="supplier_gstin" maxlength="15" autocapitalize="characters"></label>
+        <label><span>Bill / invoice no</span><input name="bill_no"></label>
+        <label><span>Bill date</span><input type="date" name="bill_date" required></label>
+        <label><span>GST on the bill (₹)</span><input type="number" name="gst" min="0" step="0.01" value="0"></label>
+        <label><span>Notes</span><input name="notes"></label>
+      </div>
+      <h3 class="form-section">Items (cost per unit, excl. GST)</h3>
+      <div id="purchaseLines"></div>
+      <button type="button" class="btn btn--ghost btn--sm kit-add" id="purchaseAddLine">+ Add item</button>
+      <p class="m-meta" id="purchaseTotal"></p>
+      <button type="submit" class="btn btn--primary btn--block">Save purchase</button>
+      <p class="login__error" id="purchaseError" role="alert"></p>
+    </form>
+  </div>
+
+  <!-- Technician rates -->
+  <div class="modal" id="ratesModal" hidden>
+    <div class="drawer__backdrop" data-close-rates></div>
+    <form class="modal__card" id="ratesForm">
+      <header class="drawer__head">
+        <h2 id="ratesTitle">Rates</h2>
+        <button type="button" class="icon-btn" data-close-rates aria-label="Close">✕</button>
+      </header>
+      <div class="modal__grid">
+        <label><span>Monthly salary (₹)</span><input type="number" name="monthly_salary" min="0" step="1"></label>
+        <label><span>Bonus per installation (₹)</span><input type="number" name="per_install" min="0" step="1"></label>
+        <label><span>Bonus per service visit (₹)</span><input type="number" name="per_visit" min="0" step="1"></label>
+        <label><span>Hourly pay (₹, if paid by the hour)</span><input type="number" name="hourly_rate" min="0" step="1"></label>
+        <label class="span-2"><span>Cost to the company per hour (₹): used for job profit</span><input type="number" name="cost_per_hour" min="0" step="1"></label>
+      </div>
+      <button type="submit" class="btn btn--primary btn--block">Save rates</button>
+      <p class="login__error" id="ratesError" role="alert"></p>
+    </form>
+  </div>
+
+  <!-- Subsidy case -->
+  <div class="modal" id="subModal" hidden>
+    <div class="drawer__backdrop" data-close-sub></div>
+    <form class="modal__card modal__card--wide" id="subForm">
+      <header class="drawer__head">
+        <div>
+          <h2 id="subTitle">Subsidy</h2>
+          <p class="muted" id="subMeta"></p>
+        </div>
+        <button type="button" class="icon-btn" data-close-sub aria-label="Close">✕</button>
+      </header>
+      <div class="modal__grid modal__grid--3">
+        <label><span>National portal application no</span><input name="application_no"></label>
+        <label><span>DISCOM</span><input name="discom" placeholder="TGSPDCL"></label>
+        <label><span>Net meter no</span><input name="net_meter_no"></label>
+      </div>
+      <h3 class="form-section">Steps: fill in the date each one happened</h3>
+      <div class="modal__grid modal__grid--3">
+        <label><span>1. Registered on the portal</span><input type="date" name="registered_on"></label>
+        <label><span>2. Feasibility approved (DISCOM)</span><input type="date" name="feasibility_on"></label>
+        <label><span>3. Installed</span><input type="date" name="installed_on"></label>
+        <label><span>4. Inspection / net meter fitted</span><input type="date" name="inspection_on"></label>
+        <label><span>5. Subsidy claim submitted</span><input type="date" name="claim_on"></label>
+        <label><span>6. Credited to the customer</span><input type="date" name="credited_on"></label>
+        <label><span>Amount credited (₹)</span><input type="number" name="credited_amount" min="0" step="1"></label>
+      </div>
+      <h3 class="form-section">Documents collected</h3>
+      <div class="inst-checklist sub-docs" id="subDocs"></div>
+      <label><span>Notes</span><textarea name="notes" rows="2"></textarea></label>
+      <label class="check"><input type="checkbox" name="rejected"> Application rejected</label>
+      <button type="submit" class="btn btn--primary btn--block">Save</button>
+      <p class="login__error" id="subError" role="alert"></p>
+    </form>
+  </div>
+
+  <!-- Installation form (technician, on site) -->
+  <div class="modal" id="installModal" hidden>
+    <div class="drawer__backdrop" data-close-install></div>
+    <form class="modal__card modal__card--wide install-form" id="installForm" onsubmit="return false">
+      <header class="drawer__head">
+        <div>
+          <h2 id="instTitle">Installation</h2>
+          <p class="muted" id="instMeta"></p>
+        </div>
+        <button type="button" class="icon-btn" data-close-install aria-label="Close">✕</button>
+      </header>
+
+      <h3 class="form-section">Checklist</h3>
+      <div class="inst-checklist" id="instChecklist"></div>
+
+      <div id="instSerialsBlock" hidden>
+        <h3 class="form-section">Panel serial numbers</h3>
+        <p class="muted">Scan each panel's serial on the roof, or type it and press Enter.</p>
+        <div id="instSerials"></div>
+      </div>
+
+      <h3 class="form-section">Photos</h3>
+      <p class="muted" id="instPhotoCount"></p>
+      <div class="photo-slots" id="instSlots"></div>
+
+      <h3 class="form-section">Handover</h3>
+      <div class="modal__grid">
+        <label><span>Installed system size (kW): confirm</span><input type="number" name="installed_kw" min="0.1" step="0.01" inputmode="decimal" required></label>
+        <label><span>Generation at handover (kWh, from the inverter)</span><input type="number" name="generation_kwh" min="0" step="0.01" inputmode="decimal"></label>
+        <label><span>Customer's name</span><input name="signed_by" autocomplete="off"></label>
+      </div>
+      <label><span>Notes</span><textarea name="install_notes" rows="2" placeholder="Anything the office should know"></textarea></label>
+      <div class="sig-wrap">
+        <span class="sig-label">Customer signature</span>
+        <canvas id="instSignature" class="sig-pad" aria-label="Signature pad"></canvas>
+        <button type="button" class="link-btn" id="instClearSig">Clear signature</button>
+      </div>
+
+      <div class="survey-actions">
+        <button type="button" class="btn btn--ghost" data-inst="save">Save progress</button>
+        <button type="button" class="btn btn--primary" data-inst="complete">Complete installation</button>
+      </div>
+      <p class="login__error" id="instError" role="alert"></p>
+    </form>
+  </div>
+
+  <!-- Service visit form (technician, on site) -->
+  <div class="modal" id="svcModal" hidden>
+    <div class="drawer__backdrop" data-close-svc></div>
+    <form class="modal__card modal__card--wide install-form" id="svcForm" onsubmit="return false">
+      <header class="drawer__head">
+        <div>
+          <h2 id="svcTitle">Service visit</h2>
+          <p class="muted" id="svcMeta"></p>
+        </div>
+        <button type="button" class="icon-btn" data-close-svc aria-label="Close">✕</button>
+      </header>
+      <div id="svcProblem" class="svc-problem"></div>
+
+      <div id="svcChecklistBlock" hidden>
+        <h3 class="form-section">Monsoon checklist</h3>
+        <div class="inst-checklist" id="svcChecklist"></div>
+      </div>
+      <div id="svcFixBlock">
+        <h3 class="form-section">What you found and did</h3>
+        <label><span>Cause found</span><input name="cause" placeholder="e.g. Water in DC junction box after rain"></label>
+        <label><span>Work done</span><textarea name="work_done" rows="2" placeholder="e.g. Dried the box, replaced MC4 pair, resealed"></textarea></label>
+      </div>
+
+      <h3 class="form-section">Parts used</h3>
+      <div id="svcParts"></div>
+      <button type="button" class="btn btn--ghost btn--sm kit-add" id="svcAddPart">+ Add part</button>
+
+      <h3 class="form-section">Photos</h3>
+      <div class="photo-slots" id="svcSlots"></div>
+
+      <h3 class="form-section">Handover</h3>
+      <div class="modal__grid">
+        <label><span>Generation after the visit (kWh)</span><input type="number" name="generation_kwh" min="0" step="0.01" inputmode="decimal"></label>
+        <label><span>Customer's name</span><input name="signed_by" autocomplete="off"></label>
+      </div>
+      <div class="sig-wrap">
+        <span class="sig-label">Customer signature</span>
+        <canvas id="svcSignature" class="sig-pad" aria-label="Signature pad"></canvas>
+        <button type="button" class="link-btn" id="svcClearSig">Clear signature</button>
+      </div>
+      <div class="survey-actions">
+        <button type="button" class="btn btn--ghost" data-svc="save">Save progress</button>
+        <button type="button" class="btn btn--primary" data-svc="complete">Complete visit</button>
+      </div>
+      <p class="login__error" id="svcError" role="alert"></p>
+    </form>
+  </div>
+
+  <!-- Safety checks before an installation can start -->
+  <div class="modal" id="safetyModal" hidden>
+    <div class="drawer__backdrop" data-close-safety></div>
+    <form class="modal__card" id="safetyForm" onsubmit="return false">
+      <header class="drawer__head">
+        <div>
+          <h2>Safety first</h2>
+          <p class="muted" id="safetyMeta"></p>
+        </div>
+        <button type="button" class="icon-btn" data-close-safety aria-label="Close">✕</button>
+      </header>
+      <p class="muted">Confirm every check before anyone goes on the roof.</p>
+      <div class="inst-checklist" id="safetyList"></div>
+      <button type="button" class="btn btn--primary btn--block" id="safetyStart">All safe: start installation</button>
+      <p class="login__error" id="safetyError" role="alert"></p>
+    </form>
+  </div>
+
+  <!-- Camera barcode scanner (serial numbers: warehouse and on the roof) -->
+  <div class="modal" id="scanModal" hidden>
+    <div class="drawer__backdrop" data-close-scan></div>
+    <div class="modal__card">
+      <header class="drawer__head">
+        <h2 id="scanTitle">Scan serial</h2>
+        <button type="button" class="icon-btn" data-close-scan aria-label="Close">✕</button>
+      </header>
+      <video id="scanVideo" class="scan-video" playsinline muted></video>
+      <p class="muted" id="scanStatus"></p>
+    </div>
+  </div>
+
   <div class="toast" id="toast" role="status" hidden></div>
 
   <script src="vendor/supabase.js"></script>
   <script src="vendor/jspdf.umd.min.js"></script>
   <script src="vendor/jspdf.plugin.autotable.min.js"></script>
-  <script src="admin.js?v=7"></script>
-  <script src="quotes.js?v=4"></script>
+  <script src="vendor/qrcode.js"></script>
+  <script src="admin.js?v=17"></script>
+  <script src="quotes.js?v=9"></script>
+  <script src="surveys.js?v=4"></script>
+  <script src="orders.js?v=8"></script>
+  <script src="scanner.js?v=1"></script>
+  <script src="warehouse.js?v=3"></script>
+  <script src="schedule.js?v=5"></script>
+  <script src="products.js?v=3"></script>
+  <script src="service.js?v=7"></script>
+  <script src="service-visits.js?v=1"></script>
+  <script src="invoices.js?v=1"></script>
+  <script src="finance.js?v=1"></script>
+  <script src="purchases.js?v=1"></script>
+  <script src="director.js?v=8"></script>
 </body>
 </html>

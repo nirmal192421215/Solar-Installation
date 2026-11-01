@@ -13,3 +13,9 @@ desktop.ini
 # Dependencies and logs
 node_modules/
 *.log
+
+# Supabase CLI local state (created on each computer, not part of the project)
+supabase/.temp/
+
+# Python
+__pycache__/

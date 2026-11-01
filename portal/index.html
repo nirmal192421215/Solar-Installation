@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <title>Localhost users · Sun Power</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23F2620F'/%3E%3Cpath d='M14 40a18 18 0 0 1 36 0z' fill='%23fff'/%3E%3Cpath d='M10 46h44' stroke='%23fff' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../admin/admin.css?v=25">
+  <link rel="stylesheet" href="portal.css?v=7">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand__mark" aria-hidden="true"></span>
+      <span>Sun Power <b>Localhost users</b></span>
+    </div>
+    <div class="topbar__right">
+      <a class="btn btn--ghost btn--sm" id="callBtn" href="tel:+919342626096">Call us</a>
+      <button type="button" class="link-btn" id="signOutBtn" hidden>Sign out</button>
+    </div>
+  </header>
+
+  <main class="main portal" id="app">
+    <p class="empty" id="loading">Loading your solar details…</p>
+  </main>
+
+  <!-- Report a problem -->
+  <div class="modal" id="reportModal" hidden>
+    <div class="drawer__backdrop" data-close-report></div>
+    <form class="modal__card" id="reportForm">
+      <header class="drawer__head">
+        <div>
+          <h2>Report a problem</h2>
+          <p class="muted">We'll reply on WhatsApp with a request number.</p>
+        </div>
+        <button type="button" class="icon-btn" data-close-report aria-label="Close">✕</button>
+      </header>
+      <fieldset class="cat-list" id="catList">
+        <legend class="sr-only">What's the problem?</legend>
+      </fieldset>
+      <p class="quote-warn" id="safetyNote" hidden></p>
+      <label><span>Tell us what's happening</span><textarea name="description" rows="3" required minlength="5" placeholder="e.g. Inverter shows E-21 since the rain last night"></textarea></label>
+      <div>
+        <span class="field-label">Photos (optional, up to 4)</span>
+        <div class="photos" id="reportPhotos"></div>
+        <label class="btn btn--ghost photo-add" id="reportPhotoAdd">
+          + Add photos
+          <input type="file" accept="image/*" capture="environment" multiple hidden id="reportPhotoInput">
+        </label>
+      </div>
+      <button type="submit" class="btn btn--primary btn--block">Send to Sun Power</button>
+      <p class="login__error" id="reportError" role="alert"></p>
+    </form>
+  </div>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+
+  <script src="../admin/vendor/supabase.js"></script>
+  <script src="../admin/vendor/jspdf.umd.min.js"></script>
+  <script src="../admin/vendor/jspdf.plugin.autotable.min.js"></script>
+  <script src="../admin/vendor/qrcode.js"></script>
+  <script src="portal.js?v=9"></script>
+</body>
+</html>

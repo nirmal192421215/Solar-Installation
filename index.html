@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=2">
+  <link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body>
 
@@ -582,6 +582,10 @@
           <details class="form__more">
             <summary>Add more details <small>(optional, helps us prepare your estimate)</small></summary>
             <div class="form__more-body">
+              <label>
+                <span>Full address</span>
+                <input type="text" name="address" autocomplete="street-address" maxlength="300" placeholder="House no, street, area">
+              </label>
               <label>
                 <span>Email</span>
                 <input type="email" name="email" autocomplete="email" placeholder="For your estimate and quote PDF">

@@ -20,7 +20,7 @@ const TERMINAL = new Set(["completed", "no-answer", "busy", "failed", "canceled"
 const NO_SPEECH = "Summary not generated as there was no user turn";
 
 // Pipeline order, so an AI call only ever moves a lead forward
-const STAGE_RANK: Record<string, number> = { new: 0, ai_called: 1, interested: 2, survey_booked: 3, quote_sent: 4 };
+const STAGE_RANK: Record<string, number> = { new: 0, ai_called: 1, interested: 2, survey_booked: 3, survey_done: 4, survey_approved: 5, quote_sent: 6 };
 
 const BOLNA_API_KEY = Deno.env.get("BOLNA_API_KEY") ?? "";
 
